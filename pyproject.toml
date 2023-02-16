@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "test-opentelemetry-fastapi"
+version = "0.1.0"
+description = ""
+authors = ["Jorge Vasconcelos <>"]
+readme = "README.md"
+packages = [{ include = "test_opentelemetry_fastapi" }]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.92.0"
+uvicorn = "^0.20.0"
+
+opentelemetry-instrumentation-fastapi = "*"
+opentelemetry-sdk = "*"
+opentelemetry-exporter-otlp-proto-grpc = "*"
+
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
