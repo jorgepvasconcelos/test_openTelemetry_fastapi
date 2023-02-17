@@ -7,20 +7,23 @@ from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExport
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 
 
-# set the service name to show in traces
-resource = Resource(attributes={"service.name": "service_fastapi"})
+class OTLPProvider:
+    def __init__(self):
+        # set the service name to show in traces
+        resource = Resource(attributes={"service.name": "service_fastapi"})
 
-# set the tracer provider
-tracer = TracerProvider(resource=resource)
-trace.set_tracer_provider(tracer_provider=tracer)
+        # set the tracer provider
+        self.__tracer_provider = TracerProvider(resource=resource)
+        trace.set_tracer_provider(tracer_provider=self.__tracer_provider)
 
-# set the processor
-otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True)
-span_processor = BatchSpanProcessor(otlp_exporter)
-tracer.add_span_processor(span_processor=span_processor)
+        # set the processor
+        otlp_exporter = OTLPSpanExporter(endpoint="http://localhost:4317", insecure=True)
+        span_processor = BatchSpanProcessor(otlp_exporter)
+        self.__tracer_provider.add_span_processor(span_processor=span_processor)
 
-
-
+    @property
+    def tracer_provider(self) -> TracerProvider:
+        return self.__tracer_provider
 
 
 def instrument(name="request"):

@@ -1,21 +1,26 @@
 import random
 import time
 
-import uvicorn
 from fastapi import FastAPI
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from tracing import *
+from tracing import OTLPProvider
 
 app = FastAPI()
 
 
+def long_func():
+    random_value = random.randint(1, 2)
+    time.sleep(random_value)
+    return random_value
+
+
 @app.get(
-path='/'
-)
+    path='/')
 def home():
-    time.sleep(random.randint(1,2))
-    return "funfou"
+    r = long_func()
+    return r
 
 
 
-FastAPIInstrumentor.instrument_app(app)
+provider = OTLPProvider()
+FastAPIInstrumentor.instrument_app(app,tracer_provider=provider.tracer_provider)
