@@ -26,6 +26,8 @@ class OTLPProvider:
         return self.__tracer_provider
 
 
+tracer_provider = OTLPProvider().tracer_provider
+tracer = tracer_provider.get_tracer(__name__)
 def instrument(name="request"):
     def decorator(method):
         @functools.wraps(method)

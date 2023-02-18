@@ -3,7 +3,8 @@ import time
 
 from fastapi import FastAPI
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
-from tracing import OTLPProvider
+
+from tracing import tracer, tracer_provider
 
 app = FastAPI()
 
@@ -17,10 +18,9 @@ def long_func():
 @app.get(
     path='/')
 def home():
-    r = long_func()
-    return r
+    with tracer.start_as_current_span(name='nameeeee') as span:
+        r = long_func()
+        return r
 
 
-
-provider = OTLPProvider()
-FastAPIInstrumentor.instrument_app(app,tracer_provider=provider.tracer_provider)
+FastAPIInstrumentor.instrument_app(app, tracer_provider=tracer_provider)
