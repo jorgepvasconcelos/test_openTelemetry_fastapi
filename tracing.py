@@ -1,4 +1,4 @@
-import functools
+from functools import wraps
 
 from opentelemetry import trace
 from opentelemetry.sdk.resources import Resource
@@ -28,29 +28,18 @@ class OTLPProvider:
 
 tracer_provider = OTLPProvider().tracer_provider
 tracer = tracer_provider.get_tracer(__name__)
-def instrument(name="request"):
-    def decorator(method):
-        @functools.wraps(method)
-        async def wrapper(*args, **kwargs):
-            tracer = trace.get_tracer(__name__)
-            with tracer.start_as_current_span(name=name) as span:
-                response = await method(*args, **kwargs)
-                return response
-
-        return wrapper
-
-    return decorator
 
 
-def instrument_sync(name="request"):
-    def decorator(method):
-        @functools.wraps(method)
+def tracer_endpoint():
+    def handler_func(function):
+        @wraps(function)
         def wrapper(*args, **kwargs):
-            tracer = trace.get_tracer(__name__)
-            with tracer.start_as_current_span(name=name) as span:
-                response = method(*args, **kwargs)
-                return response
+            with tracer.start_as_current_span(name='endpoint_tracer') as span:
+                func_return = function(*args, **kwargs)
+                span.set_attribute("endpoint.response.body", func_return.body)
+                span.set_attribute("endpoint.response.status.code", func_return.status_code)
+                return func_return
 
         return wrapper
 
-    return decorator
+    return handler_func
